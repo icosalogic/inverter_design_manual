@@ -3,8 +3,10 @@ Note: This document is under construction.
 # Introduction
 
 This document describes the design and implementation of high voltage, high current DC-AC inverters for residential markets.
-In this case, "high voltage" means that the source battery for the inverter is high enough that it can power the inverter without a transformer, even at minimum state-of-charge (SoC).
-High current means that the inverter design is capable of implementing at least 100-amp and 200-amp inverters, and possibly even 300-amp or 400-amp inverters.
+In this case, "high voltage" means that the source battery for the inverter has enough voltage and current
+that it can power the inverter without a transformer, even at minimum state-of-charge (SoC).
+High current means that the inverter design is capable of implementing at least 100-amp and 200-amp inverters,
+and possibly even 300-amp or 400-amp inverters.
 
 # Residential Inverter Market
 
@@ -12,15 +14,87 @@ This design is primarily targeted to the North American inverter market, which u
 Most dwellings have a electrical supply consisting of 3 wires, L1, L2 and neutral.
 L1 and L2 are 180 degrees out of phase, and provide 120V service with respect to the neutral wire.
 L1 and L2 can be used in tandem to provide a nominal 240V supply for appliances that require more power.
-It is common for average-sized dwellings to have 100 amp supply, with newer and larger homes use 200 amp or even 300 amp supplies.
+It is common for average-sized dwellings to have 100 amp supply, while newer and larger homes use 200 amp or even 300 amp supplies.
 
 # Inverter Architecture
 
-TBD
+An inverter is a power converter that converts DC to AC.
+The most common architecture for power converters is the classic half-bridge design.
+Lets analyze that design and determine if it is suitable for an inverter design.
 
-## Half Bridge vs T-Type
+## Overview of Half-Bridge Circuit
 
-TBD
+Here is a circuit diagram of a classic half-bridge converter.
+
+![Circuit diagram for a half-bridge converter](media/HB1.png)
+
+Using a PWM controller to switch the two MOSFETs, one can generate a voltage between 0 and the input battery
+voltage by selecting an appropriate PWM duty cycle.
+The controller logic turns Q1 and Q2 on, one at a time, to set the output voltage and current.
+Here is the current flow through the circuit when Q1 is switched on.
+In this case, the current through the circuit is increasing, limited by the *di/dt* of the inductor.
+
+![Half-bridge current flow when Q1 is on](media/HB1_Q1_on.svg)
+
+Here is the current flow when Q2 is turned on.
+
+![Half-bridge current flow when Q2 is on](media/HB1_Q2_on.svg)
+
+When Q2 is on, the converter is basically "coasting" on the inductor.
+Designers can control the output ripple current and voltage by selecting appropriate output filter components.
+
+Note, however, that this circuit can only generate DC output.
+You can generate a sine wave shaped output offset such that the minimum voltage is greater than zero,
+but this circuit will not generate alternating current.
+
+## Modified Half-Bridge Circuit
+
+The first impulse to overcome the half-bridge limitation might be to split the battery into
+two equal modules, and set that as the return line.
+Essentially, this serves as the neutral wire in a typical residential supply.
+Let's analyze that circuit to determine if it will work.
+
+![Circuit diagram for a modified half-bridge converter](media/HB2.png)
+
+Here is the current flow when Q1 is turned on.
+
+![Modified half-bridge current flow when Q1 is on](media/HB2_Q1_on.svg)
+
+Everything looks good, so far, but that is not the case when Q2 turns on.
+
+![Modified half-bridge current flow when Q2 is on](media/HB2_Q2_on.svg)
+
+There are two problems here:
+
+1. There is no "coast" phase, where the inductor is providing the output current.
+2. Switching between Q1 and Q2 causes the circuit to instantaneously attempt to switch from positive to negative current.
+Bad things happen when you do that.
+
+## T-Type Circuit
+
+An established design for inverter circuits is the T-Type architecture, as shown below.
+By adding two additional MOSFETs, we provide a controlled path from the output to the battery midpoint,
+which solves the problems with the modified half-bridge circuit.
+
+![Circuit diagram for a T-Type inverter](media/TT.png)
+
+Q1 and Q3 operate as a half-bridge for the positive half of the sine wave, while Q2 and Q4 operate
+as a mirrored half-bridge for the negative half of the wave.
+
+Note that Q3 and Q4 can be configured as either common source or common drain.
+The configuration will impact the gate driver voltage source design, but the circuit will function either way.
+
+Let's analyze the current flow of this circuit, starting with the positve half of the sine wave,
+when Q1 is on and Q3 is off.
+
+![Current flow for a T-Type inverter when Q1 is on](media/TT_1001.png)
+
+![Current flow for a T-Type inverter when Q1 is off](media/TT_0011.png)
+
+![Current flow for a T-Type inverter when Q2 is on](media/TT_0110.png)
+
+![Current flow for a T-Type inverter when Q2 is off](media/TT_0011.png)
+
 
 # Battery
 
@@ -62,8 +136,8 @@ TBD
 Residential electrical usage has a lot of transients.
 Air conditioners, hot water heaters, ovens, etc. turn on and off.
 Many devices like microwaves, toaster ovens, and coffe makers are used for at most a few minutes at a time, at most a few times a day.
-Here is an example usage graph from my house in California.
-The house has 100 amp electrical panel, and has gas water heater, clothes dryer, furnace and stove top.
+Here is an example usage graph from my house in California, showing the usage per minute for one day.
+The house has 100 amp electrical panel, with gas water heater, clothes dryer, furnace and stove top.
 Everything else is electric.
 
 ![Example residential electrical usage](media/usage_20250626.png)

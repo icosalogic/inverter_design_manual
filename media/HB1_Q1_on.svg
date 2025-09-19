@@ -1,0 +1,29 @@
+<svg width="1081" height="672" xmlns="http://www.w3.org/2000/svg">
+  <image href="HB1_Q1_on.png" x="0" y="0" width="1081" height="672"/>
+
+  <defs>
+    <marker
+      id="fat-arrow"
+      viewBox="0 0 12 12"
+      refX="6"
+      refY="6"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+      markerUnits="strokeWidth">
+      <path d="M 0 0 L 12 6 L 0 12 L 3 6 Z" fill="red" />
+    </marker>
+  </defs>
+
+  <line x1="100"  y1="250" x2="100"  y2="150" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  <line x1="150"  y1="80"  x2="500"  y2="80"  fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  <line x1="570"  y1="150" x2="570"  y2="250" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+
+  <line x1="750"  y1="370" x2="900"  y2="370" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  <line x1="980"  y1="410" x2="980"  y2="520" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  <line x1="900"  y1="580" x2="750"  y2="580" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  
+  <line x1="500"  y1="580" x2="150"  y2="580" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+  <line x1="100"  y1="550" x2="100"  y2="450" fill="none" stroke="red" stroke-width="8" marker-end="url(#fat-arrow)" />
+</svg>
+
