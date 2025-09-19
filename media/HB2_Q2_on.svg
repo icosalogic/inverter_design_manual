@@ -20,7 +20,7 @@
   <line x1="200"  y1="630" x2="530"  y2="630" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />
 
   <line x1="870"  y1="310" x2="690"  y2="310" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />
-  <line x1="1040" y1="500" x2="1040" y2="350" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />
+  <line x1="1040" y1="500" x2="1040" y2="335" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />
   <line x1="720"  y1="630" x2="870"  y2="630" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />
   
   <line x1="655"  y1="400" x2="655"  y2="550" fill="none" stroke="red" stroke-width="8" opacity="0.7" marker-end="url(#fat-arrow)" />

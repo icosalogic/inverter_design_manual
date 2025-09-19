@@ -32,13 +32,13 @@ Using a PWM controller to switch the two MOSFETs, one can generate a voltage bet
 voltage by selecting an appropriate PWM duty cycle.
 The controller logic turns Q1 and Q2 on, one at a time, to set the output voltage and current.
 Here is the current flow through the circuit when Q1 is switched on.
-In this case, the current through the circuit is increasing, limited by the *di/dt* of the inductor.
+In this case, the current through the circuit is increasing, limited by the ∂i/∂t of the inductor.
 
-![Half-bridge current flow when Q1 is on](media/HB1_Q1_on.svg)
+![Half-bridge current flow when Q1 is on](media/HB1_Q1_on_i.png)
 
 Here is the current flow when Q2 is turned on.
 
-![Half-bridge current flow when Q2 is on](media/HB1_Q2_on.svg)
+![Half-bridge current flow when Q2 is on](media/HB1_Q2_on_i.png)
 
 When Q2 is on, the converter is basically "coasting" on the inductor.
 Designers can control the output ripple current and voltage by selecting appropriate output filter components.
@@ -58,11 +58,11 @@ Let's analyze that circuit to determine if it will work.
 
 Here is the current flow when Q1 is turned on.
 
-![Modified half-bridge current flow when Q1 is on](media/HB2_Q1_on.svg)
+![Modified half-bridge current flow when Q1 is on](media/HB2_Q1_on_i.png)
 
 Everything looks good, so far, but that is not the case when Q2 turns on.
 
-![Modified half-bridge current flow when Q2 is on](media/HB2_Q2_on.svg)
+![Modified half-bridge current flow when Q2 is on](media/HB2_Q2_on_i.png)
 
 There are two problems here:
 
