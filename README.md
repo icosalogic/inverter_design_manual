@@ -20,7 +20,7 @@ It is common for average-sized dwellings to have 100 amp supply, while newer and
 
 An inverter is a power converter that converts DC to AC.
 The most common architecture for power converters is the classic half-bridge design.
-Lets analyze that design and determine if it is suitable for an inverter design.
+Let's analyze that design and determine if it is suitable for an inverter implementation.
 
 ## Overview of Half-Bridge Circuit
 
@@ -37,11 +37,13 @@ In this case, the current through the circuit is increasing, limited by the ∂i
 ![Half-bridge current flow when Q1 is on](media/HB1_Q1_on_i.png)
 
 Here is the current flow when Q2 is turned on.
+In this case, the current through the circuit is decreasing as a function of the inductor and the load.
 
 ![Half-bridge current flow when Q2 is on](media/HB1_Q2_on_i.png)
 
 When Q2 is on, the converter is basically "coasting" on the inductor.
-Designers can control the output ripple current and voltage by selecting appropriate output filter components.
+Designers can control the output ripple current and voltage by selecting appropriate output filter components,
+and the frequency at which Q1 and Q2 are switched.
 
 Note, however, that this circuit can only generate DC output.
 You can generate a sine wave shaped output offset such that the minimum voltage is greater than zero,
@@ -67,14 +69,14 @@ Everything looks good, so far, but that is not the case when Q2 turns on.
 There are two problems here:
 
 1. There is no "coast" phase, where the inductor is providing the output current.
-2. Switching between Q1 and Q2 causes the circuit to instantaneously attempt to switch from positive to negative current.
+2. Switching between Q1 and Q2 causes the circuit to attempt to instantaneously reverse the direction of current flow.
 Bad things happen when you do that.
 
 ## T-Type Circuit
 
 An established design for inverter circuits is the T-Type architecture, as shown below.
 By adding two additional MOSFETs, we provide a controlled path from the output to the battery midpoint,
-which solves the problems with the modified half-bridge circuit.
+which solves the problems with the modified half-bridge circuit shown above.
 
 ![Circuit diagram for a T-Type inverter](media/TT.png)
 
@@ -85,16 +87,25 @@ Note that Q3 and Q4 can be configured as either common source or common drain.
 The configuration will impact the gate driver voltage source design, but the circuit will function either way.
 
 Let's analyze the current flow of this circuit, starting with the positve half of the sine wave,
-when Q1 is on and Q3 is off.
+when the MOSFET switching state is 1001, i.e., Q1 is on, Q2 is off, Q3 is off, and Q4 is on.
 
-![Current flow for a T-Type inverter when Q1 is on](media/TT_1001.png)
+![Current flow for a T-Type inverter when Q1 is on](media/TT_1001_i.png)
 
-![Current flow for a T-Type inverter when Q1 is off](media/TT_0011.png)
+Here is the "coast" phase of the positive half of the sine wave, when the MOSFET switching state is 0110.
 
-![Current flow for a T-Type inverter when Q2 is on](media/TT_0110.png)
+![Current flow for a T-Type inverter when Q1 is off](media/TT_0011p_i.png)
 
-![Current flow for a T-Type inverter when Q2 is off](media/TT_0011.png)
+For the negative have of the sine wave, the current flow reverses.
+Here is the current flow for the MOSFET switching state of 0110.
 
+![Current flow for a T-Type inverter when Q2 is on](media/TT_0110_i.png)
+
+Here is the "coast" phase for the negative half of the sine wave.
+Even though the MOSFET switching state is identical to the positive coast phase, the current flow is reversed.
+
+![Current flow for a T-Type inverter when Q2 is off](media/TT_0011n_i.png)
+
+With 4 MOSFETs, there are 16 possible switching configurations, but only 3 are used.
 
 # Battery
 
@@ -106,10 +117,10 @@ headroom to provide adequate power to the inverter at minimum SoC.
 
 The following table describes possible battery configurations for the two most common lithium chemistries.
 
-| Chemistry | Cell Min V | Cell Max V | S Half | S Full | Half Min V | Half Max V | Full Min V | Full Max V |
-| --------- | ---------- | ---------- | ------ | ------ | ---------- | ---------- | ---------- | ---------- |
-| Li        | 3.0        | 4.2        | 64     | 128.0  |    192.0   |    268.8   |   384.0    |    537.6   |
-| LiFePo    | 3.0        | 3.65       | 72     | 144.0  |    216.0   |    262.8   |   432.0    |    525.6   |
+| Chemistry | Cell Min V | Cell Max V | S Half | S Full | Half Pack Min V | Half Pack Max V | Full Pack Min V | Full Pack Max V |
+| --------- | ---------- | ---------- | ------ | ------ | --------------- | --------------- | --------------- | --------------- |
+| Li        | 3.0        | 4.2        | 64     |   128  |       192.0     |       268.8     |      384.0      |       537.6     |
+| LiFePo    | 3.0        | 3.65       | 72     |   144  |       216.0     |       262.8     |      432.0      |       525.6     |
 
 # DC Link Capacitor
 
