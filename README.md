@@ -142,10 +142,10 @@ The following table describes possible battery configurations for the two most c
 The DC-link capacitors are located between the battery and the MOSFETs.
 Sizing the capacitors is pretty straightforward, using the common formula:
 
-C = I-in_RMS- / (ω-sw- * V-ripple-)
+C = I<sub>in_RMS</sub> / (ω<sub>sw</sub> * V<sub>ripple</sub>)
 
-Where I-in_RMS- is the input RMS current, ω-sw- is 2 * π * f-sw- (switching frequency), and
-V-ripple- is the maximum tolerable ripple voltage.
+Where I<sub>in_RMS</sub> is the input RMS current, ω<sub>sw</sub> is 2 * π * f<sub>sw</sub> (switching frequency), and
+V<sub>ripple</sub> is the maximum tolerable ripple voltage.
 
 For a good capacitor lifetime, select a capacitor with a voltage rating of at least 20% greater than the working voltage.
 Film capacitors have good voltage rating and current capacity.
@@ -153,45 +153,46 @@ Film capacitors have good voltage rating and current capacity.
 # MOSFETs
 
 The main criteria for selecting MOSFETs are power handling capability, and efficiency, mainly measured by
-low on-state resistance (R-ds(on)-) and low switching overhead.
+low on-state resistance (R<sub>ds(on)</sub>) and low switching overhead.
 
-The on-state resistance determines the power loss as current flows through the FET, according to the equation P = I^2^ * R-ds(on)-.
-R-ds(on)- is influenced by the junction temperature of the FET and the gate voltage used to switch the FET on.
+The on-state resistance determines the power loss as current flows through the FET, according to the
+equation P = I<sup>2</sup> * R<sub>ds(on)</sub>.
+R<sub>ds(on)</sub> is influenced by the junction temperature of the FET and the gate voltage used to switch the FET on.
 These influences are shown in the graph from the datasheet for the Infineon AIMZH120R030M1T.
 
-![FET R-ds(on)-](media/FET_Rdson.png)
+![FET R<sub>ds(on)</sub>](media/FET_Rdson.png)
 
 As this graph shows, you get better efficiency running at a cooler temperature and switching with a higher gate voltage.
 
-The switching overhead is determined by the amount of energy is consumed turning the MOSFET on (E-on-) and turning it off (E-off-).
+The switching overhead is determined by the amount of energy is consumed turning the MOSFET on (E<sub>on</sub>) and turning it off (E<sub>off</sub>).
 These two values are usually given in microjoules, and added together, give the switching overhead for one complete off/on/off cycle.
 Multiply that sum by the switching frequency to get the switching power dissipated for one second.
 
-Like the R-ds(on)- value above, E-on- and E-off- are also a function of the FET junction temperature.
+Like the R<sub>ds(on)</sub> value above, E<sub>on</sub> and E<sub>off</sub> are also a function of the FET junction temperature.
 Here is the graph for the same AIMZH120R030M1T MOSFET as above.
 
-![FET E-on_off-](media/FET_E_on_off.png)
+![FET E<sub>on</sub> and E<sub>off</off>](media/FET_E_on_off.png)
 
 As of Fall 2025, the alternatives for FETs are Silicon Carbide (SiC) or Gallium Nitride (GaN).
-SiC is preferred, due to their ability to handle high V-ds-, high current, low switching energy and fast switching speed.
-Of the available SiC MOSFETs, the author prefers Infineon SiC FETs, due to their higher V-gs(th)- allowing
+SiC is preferred, due to their ability to handle high V<sub>ds</sub>, high current, low switching energy and fast switching speed.
+Of the available SiC MOSFETs, the author prefers Infineon SiC FETs, due to their higher V<sub>gs(th)</sub> allowing
 the use of unipolar gate driver voltage sources, i.e., there is no requirement for a -5V gate driver off voltage.
 This simplifies the task of providing gate driver power domains to the inverter.
 
 The following graph shows the estimated efficiency of different FETs in an inverter with the following parameters:
 
-| Parameter    | Value    |
-| ---------    | -------- |
-| V-out-       | 120 V    |
-| I-out-       | 50 A     |
-| f-out-       | 60 Hz    |
-| f_sw-        | 60 kHz   |
-| V-batt-half- | 302.4 V  |
-| V-batt-      | 604.8 V  |
-| C-dcl-       | 40 uF    |
-| L-1-         | 114 uH   |
-| C-out-       | 16 uF    |
-| L-2-         | 18 uH    |
+| Parameter             | Value    |
+| ------------------    | -------- |
+| V<sub>out</sub>       | 120 V    |
+| I<sub>out</sub>       | 50 A     |
+| f<sub>out</sub>       | 60 Hz    |
+| f<sub>sw</sub>        | 60 kHz   |
+| V<sub>batt-half</sub> | 302.4 V  |
+| V<sub>batt</sub>      | 604.8 V  |
+| C<sub>dcl</sub>       | 40 uF    |
+| L<sub>1</sub>         | 114 uH   |
+| C<sub>out</sub>       | 16 uF    |
+| L<sub>2</sub>         | 18 uH    |
 
 ![FET comparison 1](media/FET_comp1.png)
 
