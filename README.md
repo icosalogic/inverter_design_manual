@@ -17,7 +17,7 @@ L1 and L2 can be used in tandem to provide a nominal 240V supply for appliances 
 It is common for average-sized dwellings to have 100 amp supply, while newer and larger homes use 200 amp or even 300 amp supplies.
 
 The Mexican power grid predominately uses 2 phases of a 220 volt 3-phase source running at 60 Hz.
-This yeilds a 127 volt line-to-neutral voltage at 60 Hz, but L1 and L2 are 120 degrees out of phase, so the
+This yields a 127 volt line-to-neutral voltage at 60 Hz, but L1 and L2 are 120 degrees out of phase, so the
 voltage difference between them is 220 volts.
 Some areas may be compatible with the US 120/240 volt split-phase standard.
 
@@ -117,7 +117,21 @@ With 4 MOSFETs, there are 16 possible switching combinations, but only 3 are use
 
 # Basic Parameters
 
-TBD
+The basic parameters for an inverter design are given in the table below.
+
+| Name                | Symbol           | Example Value |
+| ------------------- | ---------------- | ------------- |
+| Output Frequency    | f<sub>out</sub>  | 50 or 60 Hz   |
+| Switching Frequency | f<sub>sw</sub>   | 60 kHz        |
+| Output Voltage      | V<sub>out</sub>  | 120 V         |
+| Output Current      | I<sub>out</sub>  | 50 - 200 A    |
+| # Output Lines      | lines            | 1, 2, 3       |
+
+Many of these, such as f<sub>out</sub>, V<sub>out</sub> and lines, are dictated by the region in which
+the inverter will be operated, and grid compatibility issues.
+
+On the other hand, the value of f<sub>sw</sub> is entirely an implementation-dependent choice, and
+has a significant impact on the components used in the inverter.
 
 # Battery
 
@@ -135,7 +149,39 @@ The following table describes possible battery configurations for the two most c
 | Chemistry | Cell Min V | Cell Max V | S Half | S Full | Half Pack Min V | Half Pack Max V | Full Pack Min V | Full Pack Max V |
 | --------- | ---------- | ---------- | ------ | ------ | --------------- | --------------- | --------------- | --------------- |
 | Li        | 3.0        | 4.2        | 64     |   128  |       192.0     |       268.8     |      384.0      |       537.6     |
-| LiFePo    | 3.0        | 3.65       | 72     |   144  |       216.0     |       262.8     |      432.0      |       525.6     |
+| LiFePo    | 2.5        | 3.65       | 72     |   144  |       180.0     |       262.8     |      360.0      |       525.6     |
+
+## Why Not Use a 48 Volt Battery?
+
+The answer to this question comes down to the current required for low voltage battery, and the size
+of the conductor needed to carry that current.
+This is going to require us to do some math.
+Assume you have an inverter with the following attributes:
+
+| Parameter             | Value    |
+| ------------------    | -------- |
+| V<sub>out</sub>       | 120 V    |
+| I<sub>out</sub>       | 100 A    |
+| Number of lines       | 2        |
+| Estimated Efficiency  | 95%      |
+
+The output power of each line in this inverter is P<sub>line</sub> = V<sub>out</sub> * I<sub>out</sub>, which is 12 kW.
+
+Since there are 2 lines, the total output power of the inverter is P<sub>out</sub> = P<sub>line</sub> * 2, which is 24 kW.
+
+The amount of power the battery has to provide at maximum output power is P<sub>in</sub> = P<sub>out</sub> / efficiency,
+which is 25.26 kW.
+
+The maximum current provided by the battery will be when the battery is at minimum voltage.
+For LiFePo based 48V systems with cells in a 15S configuration, the minimum voltage is 37.5V.
+The current draw from the battery at minimum voltage and maximum output power will be
+I<sub>in</sub> = P<sub>in</sub> / V<sub>battery</sub> = 673.7A.
+The conductor required for handling 673 amps is huge, beyond even 0000.
+
+The current draw from a 144S LiFePo battery in the table above at minimum voltage will be 70.2A.
+A generic AWG 6 conductor can handle 70 amps.
+
+Imagine doing this exercise for a 200 amp, 2 line inverter.
 
 # DC Link Capacitor
 
@@ -162,7 +208,8 @@ These influences are shown in the graph from the datasheet for the Infineon AIMZ
 
 ![FET R<sub>ds(on)</sub>](media/FET_Rdson.png)
 
-As this graph shows, you get better efficiency running at a cooler temperature and switching with a higher gate voltage.
+As this graph shows, these MOSFETs have lower on resistance and therefore get better efficiency
+running at a cooler temperature and switching with a higher gate voltage.
 
 The switching overhead is determined by the amount of energy is consumed turning the MOSFET on (E<sub>on</sub>) and turning it off (E<sub>off</sub>).
 These two values are usually given in microjoules, and added together, give the switching overhead for one complete off/on/off cycle.
@@ -200,11 +247,48 @@ While the smaller FETs are more efficient, the actual power saved is relatively 
 
 # Output Filter
 
-TBD
+The output filter converts the square wave output of the PWM mechanism into the desired output waveform.
+The design of the output is based on the algorithm suggested in [^1].
+That document has an extensive list of references on output filters, if the reader is interested in
+pursuing the subject further.
 
 ## LCL vs LC Filters
 
-TBD
+For the most part, this design uses an LCL filter as shown below.
+
+![LCL Filter](media/LCL.png)
+
+The agorithm from [^1] chooses components such that L<sub>1</sub> does 90+% of the work in smoothing
+the output signal.
+The capacitor should do approximately 5% of the smoothing, and the remainder is done by L<sub>2</sub>.
+
+However, as f<sub>sw</sub> increases beyond 10-11 octaves (1024-2048 times) f<sub>out</sub>, the
+algorithm will yield a negative value for L<sub>2</sub>.
+We use this as an heuristic signal to transition from a LCL to LC filter, mostly using algorithm-selected
+values for L<sub>1</sub> and C.
+
+The selection of L<sub>1</sub> has major impact on the size of the inverter.
+We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, as shown in the image below.
+
+![Inductor Core](media/L_core.png)
+
+When you do the math for magnetic flux in the inductor core, you can derive the following:
+
+A<sub>e</sub> * A<sub>w</sub> ~= LI<sup>2</sup>
+
+Where
+- A<sub>e</sub> is the cross section of the inductor core, i.e., (OD - ID * HT / 2.
+- A<sub>w</sub> is the interior window of the core, i.e., (ID / 2)<sup>2</sup>.
+- L is the desired inductance.
+- I is the current through the inductor.
+
+Put another way, the size of the inductor goes up as the square of the current through it.
+
+This is the primary reason why most commercially available split-phase residential inverters have a
+maximum capacity of approximately 12 kW.
+The largest off-the-shelf, commercially-available inductor cores will handle approximately 50 amps,
+which is 6 kW for a single line inverter, or 12 kW for a 2-line split-phase inverter.
+To scale up the same design to double- or quadruple the size would require an inductor 4 to 16 times the size.
 
 # Cooling
 
@@ -221,7 +305,7 @@ Everything else is electric.
 
 ![Example residential electrical usage](media/usage_20250626.png)
 
-Aggregating this data for a whole year and plotting a histogram of KW used per minute yeilds the following graph.
+Aggregating this data for a whole year and plotting a histogram of KW used per minute yields the following graph.
 
 ![Residential usage histogram](media/usage_histogram_2024.png)
 
@@ -239,4 +323,10 @@ optimizations at lower power levels.
 # Summary
 
 TBD
+
+# References
+
+[^1] Said-Romdhane, M; Naouar, M; Belkhodja, I; Monmasson, E; An Improved LCL Filter Design in Order
+   to Ensure Stability without Damping and Despite Large Grid Impedance Variations.
+   [www.mdpi.com/1996-1073/10/3/336](https://www.mdpi.com/1996-1073/10/3/336)
 
