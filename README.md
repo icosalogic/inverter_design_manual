@@ -132,6 +132,7 @@ the inverter will be operated, and grid compatibility issues.
 
 On the other hand, the value of f<sub>sw</sub> is entirely an implementation-dependent choice, and
 has a significant impact on the components used in the inverter.
+I<sub>out</sub> is one of the primary factors when selecting components for the output filter section of the inverter.
 
 # Battery
 
@@ -172,7 +173,7 @@ Since there are 2 lines, the total output power of the inverter is P<sub>out</su
 The amount of power the battery has to provide at maximum output power is P<sub>in</sub> = P<sub>out</sub> / efficiency,
 which is 25.26 kW.
 
-The maximum current provided by the battery will be when the battery is at minimum voltage.
+The maximum current provided by the battery will occur when the battery is at minimum voltage.
 For LiFePo based 48V systems with cells in a 15S configuration, the minimum voltage is 37.5V.
 The current draw from the battery at minimum voltage and maximum output power will be
 I<sub>in</sub> = P<sub>in</sub> / V<sub>battery</sub> = 673.7A.
@@ -248,7 +249,7 @@ While the smaller FETs are more efficient, the actual power saved is relatively 
 # Output Filter
 
 The output filter converts the square wave output of the PWM mechanism into the desired output waveform.
-The design of the output is based on the algorithm suggested in [^1].
+The design of the output filter is based on the algorithm suggested in [1].
 That document has an extensive list of references on output filters, if the reader is interested in
 pursuing the subject further.
 
@@ -258,7 +259,7 @@ For the most part, this design uses an LCL filter as shown below.
 
 ![LCL Filter](media/LCL.png)
 
-The agorithm from [^1] chooses components such that L<sub>1</sub> does 90+% of the work in smoothing
+The agorithm from [1] chooses components such that L<sub>1</sub> does 90+% of the work in smoothing
 the output signal.
 The capacitor should do approximately 5% of the smoothing, and the remainder is done by L<sub>2</sub>.
 
@@ -268,17 +269,17 @@ We use this as an heuristic signal to transition from a LCL to LC filter, mostly
 values for L<sub>1</sub> and C.
 
 The selection of L<sub>1</sub> has major impact on the size of the inverter.
-We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, as shown in the image below.
+We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example of which is shown in the image below.
 
 ![Inductor Core](media/L_core.png)
 
 When you do the math for magnetic flux in the inductor core, you can derive the following:
 
-A<sub>e</sub> * A<sub>w</sub> ~= LI<sup>2</sup>
+A<sub>e</sub> * A<sub>w</sub> ~= L * I<sup>2</sup>
 
 Where
 - A<sub>e</sub> is the cross section of the inductor core, i.e., (OD - ID * HT / 2.
-- A<sub>w</sub> is the interior window of the core, i.e., (ID / 2)<sup>2</sup>.
+- A<sub>w</sub> is the interior window of the core, i.e., π * (ID / 2)<sup>2</sup>.
 - L is the desired inductance.
 - I is the current through the inductor.
 
@@ -326,7 +327,7 @@ TBD
 
 # References
 
-[^1] Said-Romdhane, M; Naouar, M; Belkhodja, I; Monmasson, E; An Improved LCL Filter Design in Order
+1. Said-Romdhane, M; Naouar, M; Belkhodja, I; Monmasson, E; An Improved LCL Filter Design in Order
    to Ensure Stability without Damping and Despite Large Grid Impedance Variations.
    [www.mdpi.com/1996-1073/10/3/336](https://www.mdpi.com/1996-1073/10/3/336)
 
