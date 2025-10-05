@@ -232,7 +232,7 @@ Of the available SiC MOSFETs, the author prefers Infineon SiC FETs, due to their
 the use of unipolar gate driver voltage sources, i.e., there is no requirement for a -5V gate driver off voltage.
 This simplifies the task of providing gate driver power domains to the inverter.
 
-The following graph shows the estimated efficiency of different FETs in an inverter with the following parameters:
+Assume we have an inverter with the following parameters:
 
 | Parameter             | Value    |
 | ------------------    | -------- |
@@ -247,11 +247,16 @@ The following graph shows the estimated efficiency of different FETs in an inver
 | C<sub>out</sub>       | 16 uF    |
 | L<sub>2</sub>         | 18 uH    |
 
+The following graph shows the estimated efficiency of different FETs in that inverter:
+
 ![FET efficiency comparison](media/FET_comp1.png)
 
-To switch entirely from a single larger FET to multiple smaller FETs would also add complexity to the
+This graph shows that a smaller MOSFET is more efficient at light load, where the lower switching
+energy dominates the higher R<sub>ds(on)</sub> of the smaller FET.
+
+To switch entirely from a single larger FET to multiple smaller FETs would add complexity to the
 switching logic.
-Motivation in favor of using smaller FETs is that inverters spend a majority of their time running
+One motivation in favor of using smaller FETs is that inverters spend a majority of their time running
 at relatively low power levels.
 See the section [Considerations for Optimization](#Considerations-for-Optimization) below.
 
@@ -261,7 +266,7 @@ It shows the power loss for 3 configurations which are identical except for the 
 
 ![FET power loss comparison](media/FET_comp2.png)
 
-This graph shows that a good strategy is to use a smaller MOSFET when the inverter is running at light load,
+This graph shows that a good strategy may be to use a smaller MOSFET when the inverter is running at light load,
 then switch to a bigger MOSFET when the load increases.
 
 ## Cooling MOSFETs
@@ -287,7 +292,7 @@ the MOSFETs with jet impingement.
 The cooling oil in turn could be cycled through a heat exchanger in a hot water tank in front of
 the residential hot water heater.
 In such a system, the overhead of a couple small pumps could enable the collection of the majority
-of power loss heat from the inverter, pushing the efficiency well over 99%.
+of power loss heat from the inverter, pushing the inverter efficiency well over 99%.
 
 # Output Filter
 
@@ -312,7 +317,7 @@ We use this as an heuristic signal to transition from a LCL to LC filter, mostly
 values for L<sub>1</sub> and C.
 
 The selection of L<sub>1</sub> has major impact on the size of the inverter.
-We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example of which is shown in the image below.
+We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example of which is shown in the image below[2].
 
 ![Inductor Core](media/L_core.png)
 
@@ -362,7 +367,39 @@ optimizations at lower power levels.
 
 # Summary
 
-TBD
+As noted before, there is a practical limit of about 12 kW (2 lines, 6 kW each) on the size of
+commercially available residential inverters, imposed by a combination of physics and economics.
+Here are some examples:
+
+- Growatt MIN_3000-11400TL-XH-US (max 11.4 kw)
+- EG4 IV-12000-HYB-AW-00
+
+For customers demanding a larger solution, vendors support running multiple inverters in parallel
+to generate higher current levels.
+However, most of these products are not just inverters.
+They usually also include multiple MPPT trackers for solar charging, generator start/stop connections, etc.
+Purchasing complete multifunction packages just to obtain additional inverter capacity is not cost effective.
+
+The inverter solution we propose is to have an inverter chassis that supports up to 8 power blades.
+Four blades are allocated to L1 and the other four are allocated to L2.
+There are two blades available that are the same physical size, but have are optimized for different
+load levels:
+
+1. A normal blade with 50 amp 6 kW output.
+2. A light-load blade with 25 amp 3 kW output.
+
+The chassis has a single controller that is capable of driving all 8 blades simultaneously.
+The controller monitors the output load and automatically enables the minimum number of blades to
+support the demand with the highest efficiency.
+This includes automatically detecting and using light-load blades when the demand is low enough.
+
+Another advantage of this approach is that at light and medium loads, the controller can select different blades
+in a round-robin fashion, based on FET temperature.
+Since R<sub>ds(on)</sub> and switching overhead are both temperature sensitive, using the FETs with
+the lowest temperature can yield significant efficiency gains.
+
+This design results in a single simple solution that supports a wide range of inverter configurations,
+ranging from 25 to 200 amps, in 25 amp increments, with very high efficiency.
 
 # References
 
@@ -370,3 +407,5 @@ TBD
    to Ensure Stability without Damping and Despite Large Grid Impedance Variations.
    [www.mdpi.com/1996-1073/10/3/336](https://www.mdpi.com/1996-1073/10/3/336)
 
+2. Magnetics, a division of Spang & Co.;
+   [Magnetics Powder Core Catalog](https://www.mag-inc.com/Media/Magnetics/File-Library/Product%20Literature/Powder%20Core%20Literature/Magnetics-Powder-Core-Catalog-2024.pdf)
