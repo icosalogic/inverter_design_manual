@@ -8,6 +8,11 @@ that it can power the inverter without a transformer, even at minimum state-of-c
 High current means that the inverter design is capable of implementing at least 100-amp and 200-amp inverters,
 and possibly even 300-amp or 400-amp inverters.
 
+This document is a companion for the inverter design tool described in the repository
+[inverter_design_tool](https://github.com/icosalogic/inverter_design_tool).
+The design tool is more technical, while this manual gives some rationale for how to solve different
+aspects of inverter design.
+
 # North American Residential Inverter Market
 
 This design is primarily targeted to the North American inverter market, which mostly uses a nominal 120V 60 Hz standard.
@@ -242,9 +247,47 @@ The following graph shows the estimated efficiency of different FETs in an inver
 | C<sub>out</sub>       | 16 uF    |
 | L<sub>2</sub>         | 18 uH    |
 
-![FET comparison 1](media/FET_comp1.png)
+![FET efficiency comparison](media/FET_comp1.png)
 
-While the smaller FETs are more efficient, the actual power saved is relatively low.
+To switch entirely from a single larger FET to multiple smaller FETs would also add complexity to the
+switching logic.
+Motivation in favor of using smaller FETs is that inverters spend a majority of their time running
+at relatively low power levels.
+See the section [Considerations for Optimization](#Considerations-for-Optimization) below.
+
+While the smaller FETs are more efficient, the actual power saved is relatively low, as shown in
+this graph.
+It shows the power loss for 3 configurations which are identical except for the MOSFETs.
+
+![FET power loss comparison](media/FET_comp2.png)
+
+This graph shows that a good strategy is to use a smaller MOSFET when the inverter is running at light load,
+then switch to a bigger MOSFET when the load increases.
+
+## Cooling MOSFETs
+
+More than any other component in the inverter, the MOSFETs are constrained by how efficiently they are cooled.
+The heat in a MOSFET is essentially generated in a component call the junction.
+The path to dissipate that heat from the junction to the environment has multiple steps, and each
+step has a certain thermal resistance.
+The process to solve a thermal resistance problem is essentially the same as solving an electrical resistance problem.
+The steps in a typical MOSFET thermal solution are:
+
+- Resistance from the MOSFET junction to case, R<sub>θ_jc</sub>.
+- Resistance from the case to heat sink, R<sub>θ_cs</sub>.
+- Resistance from the heat sink to ambient air, R<sub>θ_sa</sub>.
+
+These resistances are usually given in units of °C/W.
+Typical MOSFET-sized heat sinks rarely have a R<sub>θ_sa</sub> less than 3.
+For maximum realization of a MOSFET's potential, higher efficiency cooling is required.
+This can be obtained with a cool plate or jet impingement cooling.
+
+One very interesting idea would be to immerse the entire inverter in a non-conductive oil, and cool
+the MOSFETs with jet impingement.
+The cooling oil in turn could be cycled through a heat exchanger in a hot water tank in front of
+the residential hot water heater.
+In such a system, the overhead of a couple small pumps could enable the collection of the majority
+of power loss heat from the inverter, pushing the efficiency well over 99%.
 
 # Output Filter
 
@@ -290,10 +333,6 @@ maximum capacity of approximately 12 kW.
 The largest off-the-shelf, commercially-available inductor cores will handle approximately 50 amps,
 which is 6 kW for a single line inverter, or 12 kW for a 2-line split-phase inverter.
 To scale up the same design to double- or quadruple the size would require an inductor 4 to 16 times the size.
-
-# Cooling
-
-TBD
 
 # Considerations for Optimization
 
