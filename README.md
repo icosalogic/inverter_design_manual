@@ -1,9 +1,7 @@
-Note: This document is under construction.
-
 # Introduction
 
 This document describes the design and implementation of high voltage, high current DC-AC inverters for residential markets.
-In this case, "high voltage" means that the source battery for the inverter has enough voltage and current
+In this case, "high voltage" means that the source battery for the inverter has enough voltage
 that it can power the inverter without a transformer, even at minimum state-of-charge (SoC).
 High current means that the inverter design is capable of implementing at least 100-amp and 200-amp inverters,
 and possibly even 300-amp or 400-amp inverters.
@@ -13,7 +11,7 @@ This document is a companion for the inverter design tool described in the repos
 The design tool is more technical, while this manual gives some rationale for how to solve different
 aspects of inverter design.
 
-# North American Residential Inverter Market
+# North American Residential Grid Standards
 
 This design is primarily targeted to the North American inverter market, which mostly uses a nominal 120V 60 Hz standard.
 Most dwellings have a electrical supply consisting of 3 wires, L1, L2 and neutral.
@@ -205,26 +203,33 @@ Film capacitors have good voltage rating and current capacity.
 # MOSFETs
 
 The main criteria for selecting MOSFETs are power handling capability, and efficiency, mainly measured by
-low on-state resistance (R<sub>ds(on)</sub>) and low switching overhead.
+the on-state resistance (R<sub>ds(on)</sub>) and switching overhead.
 
-The on-state resistance determines the power loss as current flows through the FET, according to the
-equation P = I<sup>2</sup> * R<sub>ds(on)</sub>.
+The switching overhead is essentially a fixed cost -- the inverter has to generate an acceptable sine
+wave, even with no load.
+Most inverters run at a fixed switching frequency.
+The PWM dwell may change due to load variations, but the switching overhead remains essentially
+constant, with the exception of temperature-induced changes, as mentioned below.
+
+The switching overhead is determined by the amount of energy consumed turning the MOSFET on (E<sub>on</sub>) and turning it off (E<sub>off</sub>).
+These two values are usually given in microjoules, and added together, give the switching overhead for one complete off/on/off cycle.
+Multiply that sum by the switching frequency to get the switching power dissipated for one second.
+
+The values E<sub>on</sub> and E<sub>off</sub> vary as a function of the FET junction temperature.
+Here is the graph for the same Infineon AIMZH120R030M1T MOSFET.
+
+![FET E<sub>on</sub> and E<sub>off</off>](media/FET_E_on_off.png)
+
+The power loss due to on-state resistance is a variable overhead, it changes as the current flowing
+through the inverter changes.
+The is calculated according to the equation P = I<sup>2</sup> * R<sub>ds(on)</sub>.
 R<sub>ds(on)</sub> is influenced by the junction temperature of the FET and the gate voltage used to switch the FET on.
-These influences are shown in the graph from the datasheet for the Infineon AIMZH120R030M1T.
+An example of this is shown in the graph from the datasheet for the same AIMZH120R030M1T as above.
 
 ![FET R<sub>ds(on)</sub>](media/FET_Rdson.png)
 
 As this graph shows, these MOSFETs have lower on resistance and therefore get better efficiency
 running at a cooler temperature and switching with a higher gate voltage.
-
-The switching overhead is determined by the amount of energy is consumed turning the MOSFET on (E<sub>on</sub>) and turning it off (E<sub>off</sub>).
-These two values are usually given in microjoules, and added together, give the switching overhead for one complete off/on/off cycle.
-Multiply that sum by the switching frequency to get the switching power dissipated for one second.
-
-Like the R<sub>ds(on)</sub> value above, E<sub>on</sub> and E<sub>off</sub> are also a function of the FET junction temperature.
-Here is the graph for the same AIMZH120R030M1T MOSFET as above.
-
-![FET E<sub>on</sub> and E<sub>off</off>](media/FET_E_on_off.png)
 
 As of Fall 2025, the alternatives for FETs are Silicon Carbide (SiC) or Gallium Nitride (GaN).
 SiC is preferred, due to their ability to handle high V<sub>ds</sub>, high current, low switching energy and fast switching speed.
@@ -297,7 +302,7 @@ of power loss heat from the inverter, pushing the inverter efficiency well over 
 # Output Filter
 
 The output filter converts the square wave output of the PWM mechanism into the desired output waveform.
-The design of the output filter is based on the algorithm suggested in [1].
+The selection of components in the output filter is based on the algorithm suggested in [1].
 That document has an extensive list of references on output filters, if the reader is interested in
 pursuing the subject further.
 
@@ -321,7 +326,7 @@ We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example 
 
 ![Inductor Core](media/L_core.png)
 
-When you do the math for magnetic flux in the inductor core, you can derive the following:
+When you do the math for magnetic flux in the inductor core, you can derive the following relationship:
 
 A<sub>e</sub> * A<sub>w</sub> ~= L * I<sup>2</sup>
 
@@ -337,7 +342,7 @@ This is the primary reason why most commercially available split-phase residenti
 maximum capacity of approximately 12 kW.
 The largest off-the-shelf, commercially-available inductor cores will handle approximately 50 amps,
 which is 6 kW for a single line inverter, or 12 kW for a 2-line split-phase inverter.
-To scale up the same design to double- or quadruple the size would require an inductor 4 to 16 times the size.
+To scale up the same design to double- or quadruple the current would require an inductor 4 to 16 times the size.
 
 # Considerations for Optimization
 
@@ -371,14 +376,19 @@ As noted before, there is a practical limit of about 12 kW (2 lines, 6 kW each) 
 commercially available residential inverters, imposed by a combination of physics and economics.
 Here are some examples:
 
-- Growatt MIN_3000-11400TL-XH-US (max 11.4 kw)
-- EG4 IV-12000-HYB-AW-00
+- Growatt MIN_3000-11400TL-XH-US [3]
+- EG4 IV-12000-HYB-AW-00 [4]
+- Tesla Powerwall [5]
 
-For customers demanding a larger solution, vendors support running multiple inverters in parallel
-to generate higher current levels.
+For customers demanding a larger solution, most vendors support running multiple inverters in
+parallel to generate higher current levels.
 However, most of these products are not just inverters.
 They usually also include multiple MPPT trackers for solar charging, generator start/stop connections, etc.
+The Tesla Powerwall is an integrated battery/inverter package, so you can't scale inverter or battery
+capacity independently.
 Purchasing complete multifunction packages just to obtain additional inverter capacity is not cost effective.
+
+A better solution is to replicate just the power section, rather than the entire package.
 
 The inverter solution we propose is to have an inverter chassis that supports up to 8 power blades.
 Four blades are allocated to L1 and the other four are allocated to L2.
@@ -393,13 +403,16 @@ The controller monitors the output load and automatically enables the minimum nu
 support the demand with the highest efficiency.
 This includes automatically detecting and using light-load blades when the demand is low enough.
 
-Another advantage of this approach is that at light and medium loads, the controller can select different blades
-in a round-robin fashion, based on FET temperature.
+Another advantage of this approach is that at light and medium loads, the controller can select
+different blades in a round-robin fashion, based on FET temperature.
 Since R<sub>ds(on)</sub> and switching overhead are both temperature sensitive, using the FETs with
 the lowest temperature can yield significant efficiency gains.
 
 This design results in a single simple solution that supports a wide range of inverter configurations,
 ranging from 25 to 200 amps, in 25 amp increments, with very high efficiency.
+
+If testing with an 8-blade chassis is successful, a 12-blade chassis can be constructed that would
+support either 300 amp split phase or 200 amp 3-phase solutions.
 
 # References
 
@@ -409,3 +422,9 @@ ranging from 25 to 200 amps, in 25 amp increments, with very high efficiency.
 
 2. Magnetics, a division of Spang & Co.;
    [Magnetics Powder Core Catalog](https://www.mag-inc.com/Media/Magnetics/File-Library/Product%20Literature/Powder%20Core%20Literature/Magnetics-Powder-Core-Catalog-2024.pdf)
+
+3. Growatt New Energy; [MIN 8200-11400TL-XH-US Datasheet](https://us.growatt.com/upload/file/MIN_8200-11400TL-XH-US_Datasheet_EN_202502.pdf)
+
+4. EG4 Electronics; [EG4 18kPV Hybrid Inverter Spec Sheet](https://eg4electronics.com/wp-content/uploads/2024/04/EG4-18KPV-12LV-Spec-Sheet.pdf)
+
+5. Tesla; [Powerwall 3 Datasheet](https://energylibrary.tesla.com/docs/Public/EnergyStorage/Powerwall/3/Datasheet/en-us/Powerwall-3-Datasheet.pdf)
