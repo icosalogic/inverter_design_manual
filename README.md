@@ -297,7 +297,7 @@ One very interesting idea would be to immerse the entire inverter in a non-condu
 the MOSFETs with jet impingement.
 The cooling oil in turn could be cycled through a heat exchanger in a hot water tank in front of
 the residential hot water heater.
-In such a system, the overhead of a couple small pumps could enable the collection and use of the
+In such a system, the overhead of a couple small pumps could enable the harvesting of the
 majority of power loss heat from the inverter, rather than discarding it into the environment.
 This could raise the inverter efficiency to well over 99%.
 
@@ -380,7 +380,8 @@ Here are some examples:
 
 - Growatt MIN_3000-11400TL-XH-US [3]
 - EG4 IV-12000-HYB-AW-00 [4]
-- Tesla Powerwall [5]
+- Tesla Powerwall 3 [5]
+- GoodWe GW11K4-ES-US20 [6]
 
 For customers demanding a larger solution, most vendors support running multiple inverters in
 parallel to generate higher current levels.
@@ -409,6 +410,10 @@ The following graph shows the power loss curve for such a configuration in a 6 k
 ![Hybrid inverter configuration](media/Summary_cfg.png)
 
 The controller would select the light-load blade at loads up to 20 amps, then switch to the normal blade.
+Using the annual usage histogram data from above, this graph shows the annual energy savings resulting
+from this hybrid configuration.
+
+![Hybrid inverter annual power loss savings](media/Summary_loss.png)
 
 Another advantage of this approach is that at light and medium loads, the controller can select
 different blades in a round-robin fashion, based on FET temperature.
@@ -437,3 +442,5 @@ support either 300 amp split phase or 200 amp 3-phase solutions.
 4. EG4 Electronics; [EG4 18kPV Hybrid Inverter Spec Sheet](https://eg4electronics.com/wp-content/uploads/2024/04/EG4-18KPV-12LV-Spec-Sheet.pdf)
 
 5. Tesla; [Powerwall 3 Datasheet](https://energylibrary.tesla.com/docs/Public/EnergyStorage/Powerwall/3/Datasheet/en-us/Powerwall-3-Datasheet.pdf)
+
+6. GoodWe Technologies Co., Ltd.; [ES-US Series Datasheet](https://us.goodwe.com/Ftp/EN/Downloads/Datasheet/GW_ES-US_Datasheet-EN.pdf)
