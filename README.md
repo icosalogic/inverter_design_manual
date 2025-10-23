@@ -318,7 +318,7 @@ The agorithm from [1] chooses components such that L<sub>1</sub> does 90+% of th
 the output signal.
 The capacitor should do approximately 5% of the smoothing, and the remainder is done by L<sub>2</sub>.
 
-However, as f<sub>sw</sub> increases beyond 10-11 octaves (1024-2048 times) f<sub>out</sub>, the
+However, as f<sub>sw</sub> increases beyond 10-11 octaves (1024-2048 times) above f<sub>out</sub>, the
 algorithm will yield a negative value for L<sub>2</sub>.
 We use this as an heuristic signal to transition from a LCL to LC filter, mostly using algorithm-selected
 values for L<sub>1</sub> and C.
@@ -339,6 +339,15 @@ Where
 - I is the current through the inductor.
 
 Put another way, the size of the inductor goes up as the square of the current through it.
+
+Once you have the basic parameters of an inverter, especially the maximum current it will provide,
+you've established the primary value that dictates the size of the inductor core.
+There are some additional concerns, for example, the material in the inductor core determines
+the maximum recommended current density (J) in the winding conductor used in the inductor.
+The value for J typically ranges from 4 to 6 A/mm<sup>2</sup>.
+J in turn dictates the size of the winding conductor, which then puts an upper bound on the
+number of turns of that conductor that can fit within any given inductor core's
+interior window A<sub>w</sub>.
 
 This is the primary reason why most commercially available split-phase residential inverters have a
 maximum capacity of approximately 12 kW.
@@ -395,10 +404,10 @@ A better solution is to replicate just the power section, rather than the entire
 
 The inverter solution we propose is to have an inverter chassis that supports up to 8 power blades.
 Four blades are allocated to L1 and the other four are allocated to L2.
-There are two blades available that are the same physical size, but have are optimized for different
+There are two blade variants available that are the same physical size, but are optimized for different
 load levels:
 
-1. A normal blade with 50 amp 6 kW output.
+1. A high-load blade with 50 amp 6 kW output.
 2. A light-load blade with 25 amp 3 kW output.
 
 The chassis has a single controller that is capable of driving all 8 blades simultaneously.
@@ -409,17 +418,17 @@ The following graph shows the power loss curve for such a configuration in a 6 k
 
 ![Hybrid inverter configuration](media/Summary_cfg.png)
 
-The controller would select the light-load blade at loads up to 20 amps, then switch to the normal blade.
+The controller would select the light-load blade at loads up to 20 amps, then switch to the high-load blade.
 Using the annual usage histogram data from above, this graph shows the annual energy savings resulting
 from this hybrid configuration.
 
 ![Hybrid inverter annual power loss savings](media/Summary_loss.png)
 
-Another advantage of this approach is that at light and medium loads, the controller can select
+Another advantage of this approach is that at light and high loads, the controller can select
 different blades in a round-robin fashion, based on FET temperature.
 Since R<sub>ds(on)</sub> and switching overhead are both temperature sensitive, using the FETs with
 the lowest temperature can yield significant efficiency gains.
-Note that all the efficiency and power loss graphs shown so far are computed at a steady state
+Note that all the efficiency and power loss graphs shown so far are estimated for a steady state
 temperature, so the round-robin blade selection algorithm would yield lower losses than already shown.
 
 This design results in a single simple solution that supports a wide range of inverter configurations,
