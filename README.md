@@ -364,7 +364,23 @@ Here is an example usage graph from my house in California, showing the usage pe
 The house has 100 amp electrical panel, with gas water heater, clothes dryer, furnace and stove top.
 Everything else is electric.
 
-![Example residential electrical usage](media/usage_20250626.png)
+Most electrical service providers do not give customers a very detailed picture of their electrical usage.
+For example, Southern California Edison (SCE) provides usage by the hour as the most detailed report
+available to consumers.
+
+![Utility-provided residential electrical usage](media/usage_20250626_sce.png)
+
+However, the SCE meter is taking readings every 5-8 seconds.
+Aggregating those raw readings to produce a graph of usage by the minute, including minimum,
+maximum, and average usage, gives a much more realistic impression of actual usage.
+
+![Detailed residential electrical usage](media/usage_20250626.png)
+
+Looking at this level of detail shows that inverter designers need to optimize the inverter for
+efficiency at low power levels, since the average residential inverter spends most of it's time
+producing relatively low output power.
+Designers also need to make sure the inverter is capable of handling usage spikes and the maximum
+power level that may be required when there is overlap of spikes from different devices.
 
 Aggregating this data for a whole year and plotting a histogram of KW used per minute yields the following graph.
 
@@ -424,7 +440,7 @@ from this hybrid configuration.
 
 ![Hybrid inverter annual power loss savings](media/Summary_loss.png)
 
-Another advantage of this approach is that at light and high loads, the controller can select
+Another advantage of this approach is that at light and medium loads, the controller can select
 different blades in a round-robin fashion, based on FET temperature.
 Since R<sub>ds(on)</sub> and switching overhead are both temperature sensitive, using the FETs with
 the lowest temperature can yield significant efficiency gains.
