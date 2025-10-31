@@ -403,22 +403,22 @@ As noted before, there is a practical limit of about 12 kW (2 lines, 6 kW each) 
 commercially available residential inverters, imposed by a combination of physics and economics.
 Here are some examples:
 
-- Growatt MIN_3000-11400TL-XH-US [3]
-- EG4 IV-12000-HYB-AW-00 [4]
-- Tesla Powerwall 3 [5]
-- GoodWe GW11K4-ES-US20 [6]
+- Growatt MIN_3000-11400TL-XH-US (11.4 kW) [3]
+- EG4 IV-12000-HYB-AW-00 (12 kW) [4]
+- Tesla Powerwall 3 (11.5 kW) [5]
+- GoodWe GW11K4-ES-US20 (11.4 kW) [6]
 
 For customers demanding a larger solution, most vendors support running multiple inverters in
 parallel to generate higher current levels.
 However, most of these products are not just inverters.
 They usually also include multiple MPPT trackers for solar charging, generator start/stop connections, etc.
-The Tesla Powerwall is an integrated battery/inverter package, so you can't scale inverter or battery
-capacity independently.
+The Tesla Powerwall is an integrated battery/inverter package, so you can't scale the inverter
+independently of battery capacity.
 Purchasing complete multifunction packages just to obtain additional inverter capacity is not cost effective.
 
 A better solution is to replicate just the power section, rather than the entire package.
 
-The inverter solution we propose is to have an inverter chassis that supports up to 8 power blades.
+The solution we propose is to have an inverter chassis that supports up to 8 power blades.
 Four blades are allocated to L1 and the other four are allocated to L2.
 There are two blade variants available that are the same physical size, but are optimized for different
 load levels:
