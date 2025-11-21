@@ -30,8 +30,9 @@ Dimensions are in mm.
 | Battery Middle   |  44.70 | 12.70 |
 | Battery Negative |  73.40 | 12.70 |
 | Signal Connector | 102.10 | 30.48 |
-| Neutral          | 148.58 | 19.35 |
-| Line Out         | 183.93 | 19.35 |
+| Neutral          | 148.58 | 19.05 |
+| Line Alt         | 183.63 | 19.05 |
+| Line Out         | 218.68 | 19.05 |
 
 # Power Connections
 
@@ -43,11 +44,11 @@ There are 5 power connections for the blade:
 4. Line output
 5. Neutral (connected to battery middle)
 
-These connections attach to the main power busses running along the floor of the inverter chassis.
-Attachment is by threaded fasteners through the bus and the blade connector.
+These connections attach to the main power conductors running along the floor of the inverter chassis.
+Attachment is by threaded fasteners through the conductor bus and the blade connector.
 The dimensions of these connections are sized according to the power level of the blade.
 
-All power traces on the blade are the same thickness -- 0.022 inch / 0.5588 mm.
+All power traces on the blade are the same thickness -- 0.022 inch / 0.5588 mm / 17 oz.
 
 The width of the battery traces on the blade is 0.5 inch / 12.7 mm.
 The width of the output traces is 0.75 inch / 19.35 mm.
@@ -72,22 +73,22 @@ Here are the pin assignments for the signal connector:
  7. B Presence pin.  Weak pull down resistor on the chassis, strong pull up resistor on the blade
                      allows the controller to detect when a blade is inserted at that position.
  8. C Disable pin.  Disables gate drivers for this blade.  Allows controller to determine output power and efficiency.
- 9. C Q1 -- Gate driver signal for Q1 MOSFET.
-10. C Q2 -- Gate driver signal for Q2 MOSFET.
-11. C Q3 -- Gate driver signal for Q3 MOSFET.
-12. C Q4 -- Gate driver signal for Q4 MOSFET.
-13. P Ground
-14. C SDA -- I2C data signal.
-15. C SCL -- I2C clock signal.
-16. B A0 -- I2C / blade address.
-17. B A1 -- I2C / blade address.
-18. B A2 -- I2C / blade address.
-19. B A3 -- I2C / blade address.
-20.   TBD (Reserve for A4?)
-21.   TBD
-22.   TBD
-23.   TBD
-24.   TBD
+ 9. B A0 -- I2C / blade address.
+10. B A1 -- I2C / blade address.
+11. B A2 -- I2C / blade address.
+12. TBD
+13. TBD
+14. TBD
+15. P Ground
+16. P Ground
+17. C Q1 -- Gate driver signal for Q1 MOSFET
+18. C Q2 -- Gate driver signal for Q2 MOSFET
+19. C Q3 -- Gate driver signal for Q3 MOSFET
+20. C Q4 -- Gate driver signal for Q4 MOSFET
+21. P Ground
+22. P Ground
+23. C SDA -- I2C data signal
+24. C SCL -- I2C clock signal
 
 The dimenasions of the 2x12 connector are 1.2 inches / 30.48 mm long by 0.2 inch / 0.508 mm wide.
 

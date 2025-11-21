@@ -123,13 +123,13 @@ With 4 MOSFETs, there are 16 possible switching combinations, but only 3 are use
 
 The basic parameters for an inverter design are given in the table below.
 
-| Name                | Symbol           | Example Value |
-| ------------------- | ---------------- | ------------- |
-| Output Frequency    | f<sub>out</sub>  | 50 or 60 Hz   |
-| Switching Frequency | f<sub>sw</sub>   | 60 kHz        |
-| Output Voltage      | V<sub>out</sub>  | 120 V         |
-| Output Current      | I<sub>out</sub>  | 50 - 200 A    |
-| # Output Lines      | lines            | 1, 2, 3       |
+| Name                   | Symbol           | Example Value |
+| ---------------------- | ---------------- | ------------- |
+| Output Frequency       | f<sub>out</sub>  | 50 or 60 Hz   |
+| Switching Frequency    | f<sub>sw</sub>   | 60 kHz        |
+| Output Voltage         | V<sub>out</sub>  | 120 V         |
+| Output Current         | I<sub>out</sub>  | 50 - 200 A    |
+| Number of Output Lines | lines            | 1, 2, 3       |
 
 Many of these, such as f<sub>out</sub>, V<sub>out</sub> and lines, are dictated by the region in which
 the inverter will be operated, and grid compatibility issues.
@@ -170,20 +170,20 @@ Assume you have an inverter with the following attributes:
 | Number of lines       | 2        |
 | Estimated Efficiency  | 95%      |
 
-The output power of each line in this inverter is P<sub>line</sub> = V<sub>out</sub> * I<sub>out</sub>, which is 12 kW.
+The output power of each line in this inverter is P<sub>line</sub> = V<sub>out</sub> * I<sub>out</sub> = 12 kW.
 
-Since there are 2 lines, the total output power of the inverter is P<sub>out</sub> = P<sub>line</sub> * 2, which is 24 kW.
+Since there are 2 lines, the total output power of the inverter is P<sub>out</sub> = P<sub>line</sub> * 2 = 24 kW.
 
-The amount of power the battery has to provide at maximum output power is P<sub>in</sub> = P<sub>out</sub> / efficiency,
-which is 25.26 kW.
+The amount of power the battery has to provide at maximum output power is P<sub>in</sub> = P<sub>out</sub> / efficiency = 25.26 kW.
 
 The maximum current provided by the battery will occur when the battery is at minimum voltage.
 For LiFePo based 48V systems with cells in a 15S configuration, the minimum voltage is 37.5V.
 The current draw from the battery at minimum voltage and maximum output power will be
 I<sub>in</sub> = P<sub>in</sub> / V<sub>battery</sub> = 673.7A.
-The conductor required for handling 673 amps is huge, beyond even 0000.
+The conductor required for handling 673 amps is huge, beyond even AWG 4/0.
 
-The current draw from a 144S LiFePo battery in the table above at minimum voltage will be 70.2A.
+Switching from a nominal 48V battery to the 144S LiFePo battery in the table above, at minimum
+voltage (360V), the current would be 70.2A.
 A generic AWG 6 conductor can handle 70 amps.
 
 Imagine doing this exercise for a 200 amp, 2 line inverter.
@@ -217,11 +217,11 @@ These two values are usually given in microjoules, and added together, give the 
 Multiply that sum by the switching frequency to get the switching power dissipated for one second.
 
 The values E<sub>on</sub> and E<sub>off</sub> vary as a function of the FET junction temperature.
-Here is the graph for the Infineon AIMZH120R030M1T MOSFET.
+Here is the graph for the Infineon AIMZH120R030M1T MOSFET [1].
 
 ![FET E<sub>on</sub> and E<sub>off</off>](media/FET_E_on_off.png)
 
-The power loss due to on-state resistance is a variable overhead, it changes as the current flowing
+The power loss due to on-state resistance is a variable overhead; it changes as the current flowing
 through the inverter changes, as calculated according to the equation P = I<sup>2</sup> * R<sub>ds(on)</sub>,
 where I is the current flowing through the FET.
 R<sub>ds(on)</sub> is influenced by the junction temperature of the FET and the gate voltage used to switch the FET on.
@@ -229,8 +229,8 @@ An example of this is shown in the graph from the datasheet for the same AIMZH12
 
 ![FET R<sub>ds(on)</sub>](media/FET_Rdson.png)
 
-As this graph shows, these MOSFETs have lower on resistance and therefore get better efficiency
-running at a cooler temperature and switching with a higher gate voltage.
+As this graph shows, at lower temperatures these MOSFETs have lower on resistance and are therefore more efficient.
+Note that they also have a lower on resistance / higher efficiency with a higher gate voltage.
 
 As of Fall 2025, the alternatives for FETs are Silicon Carbide (SiC) or Gallium Nitride (GaN).
 SiC is preferred, due to their ability to handle high V<sub>ds</sub>, high current, low switching energy and fast switching speed.
@@ -304,7 +304,7 @@ This could raise the inverter efficiency to well over 99%.
 # Output Filter
 
 The output filter converts the square wave output of the PWM mechanism into the desired output waveform.
-The selection of components in the output filter is based on the algorithm suggested in [1].
+The selection of components in the output filter is based on the algorithm suggested in [2].
 That document has an extensive list of references on output filters, if the reader is interested in
 pursuing the subject further.
 
@@ -324,7 +324,7 @@ We use this as an heuristic signal to transition from a LCL to LC filter, mostly
 values for L<sub>1</sub> and C.
 
 The selection of L<sub>1</sub> has major impact on the size of the inverter.
-We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example of which is shown in the image below [2].
+We use a toroid-shaped inductor core as the basis for L<sub>1</sub>, an example of which is shown in the image below [3].
 
 ![Inductor Core](media/L_core.png)
 
@@ -360,7 +360,7 @@ To scale up the same design to double- or quadruple the current would require an
 Residential electrical usage has a lot of transients.
 Air conditioners, hot water heaters, ovens, etc. turn on and off.
 Many devices like microwaves, toaster ovens, and coffe makers are used for at most a few minutes at a time, at most a few times a day.
-Here is an example usage graph from my house in California, showing the usage per minute for one day.
+Below are example usage graphs from my house in California.
 The house has 100 amp electrical panel, with gas water heater, clothes dryer, furnace and stove top.
 Everything else is electric.
 
@@ -403,10 +403,10 @@ As noted before, there is a practical limit of about 12 kW (2 lines, 6 kW each) 
 commercially available residential inverters, imposed by a combination of physics and economics.
 Here are some examples:
 
-- Growatt MIN_3000-11400TL-XH-US (11.4 kW) [3]
-- EG4 IV-12000-HYB-AW-00 (12 kW) [4]
-- Tesla Powerwall 3 (11.5 kW) [5]
-- GoodWe GW11K4-ES-US20 (11.4 kW) [6]
+- Growatt MIN_3000-11400TL-XH-US (11.4 kW) [4]
+- EG4 IV-12000-HYB-AW-00 (12 kW) [5]
+- Tesla Powerwall 3 (11.5 kW) [6]
+- GoodWe GW11K4-ES-US20 (11.4 kW) [7]
 
 For customers demanding a larger solution, most vendors support running multiple inverters in
 parallel to generate higher current levels.
@@ -453,19 +453,34 @@ ranging from 25 to 200 amps, in 25 amp increments, with very high efficiency.
 If testing with an 8-blade chassis is successful, a 12-blade chassis can be constructed that would
 support either 300 amp split phase or 200 amp 3-phase solutions.
 
+# Components
+
+1. 8-blade chassis
+2. Battery connectors and bus bars
+3. L1, L2, Neutral connectors and bus bars
+4. Controller board
+5. Power measurment board
+6. L1 blade signal board
+7. L2 blade signal board
+8. 1 or more blade boards
+9. Cooling (TBD)
+
 # References
 
-1. Said-Romdhane, M; Naouar, M; Belkhodja, I; Monmasson, E; An Improved LCL Filter Design in Order
+1. Infineon Technologies AG:
+   [AIMZH120R030M1T Datasheet](https://www.infineon.com/assets/row/public/documents/10/49/infineon-aimzh120r030m1t-datasheet-en.pdf)
+
+2. Said-Romdhane, M; Naouar, M; Belkhodja, I; Monmasson, E; An Improved LCL Filter Design in Order
    to Ensure Stability without Damping and Despite Large Grid Impedance Variations.
    [www.mdpi.com/1996-1073/10/3/336](https://www.mdpi.com/1996-1073/10/3/336)
 
-2. Magnetics, a division of Spang & Co.;
+3. Magnetics, a division of Spang & Co.;
    [Magnetics Powder Core Catalog](https://www.mag-inc.com/Media/Magnetics/File-Library/Product%20Literature/Powder%20Core%20Literature/Magnetics-Powder-Core-Catalog-2024.pdf)
 
-3. Growatt New Energy; [MIN 8200-11400TL-XH-US Datasheet](https://us.growatt.com/upload/file/MIN_8200-11400TL-XH-US_Datasheet_EN_202502.pdf)
+4. Growatt New Energy; [MIN 8200-11400TL-XH-US Datasheet](https://us.growatt.com/upload/file/MIN_8200-11400TL-XH-US_Datasheet_EN_202502.pdf)
 
-4. EG4 Electronics; [EG4 18kPV Hybrid Inverter Spec Sheet](https://eg4electronics.com/wp-content/uploads/2024/04/EG4-18KPV-12LV-Spec-Sheet.pdf)
+5. EG4 Electronics; [EG4 18kPV Hybrid Inverter Spec Sheet](https://eg4electronics.com/wp-content/uploads/2024/04/EG4-18KPV-12LV-Spec-Sheet.pdf)
 
-5. Tesla; [Powerwall 3 Datasheet](https://energylibrary.tesla.com/docs/Public/EnergyStorage/Powerwall/3/Datasheet/en-us/Powerwall-3-Datasheet.pdf)
+6. Tesla; [Powerwall 3 Datasheet](https://energylibrary.tesla.com/docs/Public/EnergyStorage/Powerwall/3/Datasheet/en-us/Powerwall-3-Datasheet.pdf)
 
-6. GoodWe Technologies Co., Ltd.; [ES-US Series Datasheet](https://us.goodwe.com/Ftp/EN/Downloads/Datasheet/GW_ES-US_Datasheet-EN.pdf)
+7. GoodWe Technologies Co., Ltd.; [ES-US Series Datasheet](https://us.goodwe.com/Ftp/EN/Downloads/Datasheet/GW_ES-US_Datasheet-EN.pdf)
